@@ -6,12 +6,11 @@
   </div>
 </template>
 <script>
-import { getLoginQrCode } from '../../api/user'
 export default {
   name: 'Login',
   data() {
     return {
-      loginQrCode: '',
+      loginQrCode: 'https://www.hookfunc.com/api/wechat/login/qr/code',
       loginCode: ''
     }
   },
@@ -20,12 +19,6 @@ export default {
   },
   methods: {
     loadLoginQrCode() {
-      getLoginQrCode().then(res => {
-        console.log(res)
-        this.loginQrCode = 'https://www.hookfunc.com/public/resource/img/hookfunc.svg'
-      }).catch(err => {
-        console.log(err)
-      })
     },
     handleLogin() {
       this.$store.dispatch('user/login', this.loginCode).then(() => {

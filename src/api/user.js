@@ -1,12 +1,5 @@
 import request from '@/utils/request'
 
-export function getLoginQrCode() {
-  return request({
-    url: '/user/login/qr/code',
-    method: 'get'
-  })
-}
-
 export function login(data) {
   return request({
     url: '/user/getToken',
