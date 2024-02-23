@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
-    <div class="qr-code-div">
-      <img :src="loginQrCode" alt="">
+    <div>
+      <img class="qr-code-div" :src="loginQrCode" alt="">
     </div>
   </div>
 </template>
@@ -48,8 +48,8 @@ $cursor: #fff;
 
 .qr-code-div {
   text-align: center;
-  /*让div内部文字居中*/
-  width: 400px;
+  border-radius: 5%;
+  width: 300px;
   height: 300px;
   margin: auto;
   position: absolute;
