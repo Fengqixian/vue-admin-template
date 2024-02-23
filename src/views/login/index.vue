@@ -1,17 +1,31 @@
 <template>
   <div class="login-container">
     <div>
-      <img class="qr-code-div" :src="loginQrCode" alt="">
+      <div v-if="qrCodeExpire" class="qr-code-div custom-center expire-cover">
+        <span class="expire-text">二维码已过期</span>
+      </div>
+      <el-image class="qr-code-div" :src="loginQrCode" :loading="loadingLoginCode">
+        <div slot="error" class="image-slot">
+          <div class="qr-code-div custom-center loading-cover">
+            <i class="el-icon-loading" style="font-size: 24px;" />
+          </div>
+        </div>
+      </el-image>
     </div>
   </div>
 </template>
 <script>
+import { wechatLoginCode } from '../../api/user'
+
 export default {
   name: 'Login',
   data() {
     return {
-      loginQrCode: 'https://www.hookfunc.com/api/wechat/login/qr/code',
-      loginCode: ''
+      loadingLoginCode: false,
+      loginQrCode: '',
+      loginCode: '',
+      qrCodeExpire: false, // 请求次数
+      intervalId: null // setInterval的ID
     }
   },
   created() {
@@ -19,12 +33,26 @@ export default {
   },
   methods: {
     loadLoginQrCode() {
+      this.loadingLoginCode = true
+      wechatLoginCode().then(data => {
+        this.loginCode = data.code
+        this.loginQrCode = 'data:image/png;base64,' + data.wechatCode
+        this.loadingLoginCode = false
+        this.intervalId = setInterval(this.handleLogin, 1000)
+      }).catch(err => {
+        console.log(err)
+        this.loadingLoginCode = false
+      })
     },
     handleLogin() {
-      this.$store.dispatch('user/login', this.loginCode).then(() => {
-        this.$router.push({ path: this.redirect || '/' })
+      this.$store.dispatch('user/login', this.loginCode).then(res => {
+        if (res) {
+          clearInterval(this.intervalId)
+          this.$router.push({ path: this.redirect || '/' })
+        }
       }).catch(() => {
-        this.loading = false
+        clearInterval(this.intervalId)
+        this.qrCodeExpire = true
       })
     }
 
@@ -44,6 +72,28 @@ $cursor: #fff;
   .login-container .el-input input {
     color: $cursor;
   }
+}
+
+.custom-center {
+  display: flex;
+  align-items: center; /* 在交叉轴上居中 */
+  justify-content: center; /* 在主轴上居中 */
+}
+
+.loading-cover {
+  background-color: white;
+}
+
+.expire-cover {
+  z-index: 999;
+  background-color: rgba(77, 73, 73, 0.5); /* 设置背景色为半透明的红色 */
+}
+
+.expire-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  opacity: 1;
 }
 
 .qr-code-div {

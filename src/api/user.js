@@ -1,24 +1,29 @@
 import request from '@/utils/request'
 
-export function login(data) {
+export function wechatLoginCode() {
   return request({
-    url: '/user/getToken',
-    method: 'post',
-    data
+    url: '/wechat/login/qr/code',
+    method: 'get'
   })
 }
 
-export function getInfo(token) {
+export function login(loginCode) {
   return request({
-    url: '/vue-admin-template/user/info',
-    method: 'get',
-    params: { token }
+    url: '/wechat/login/check/' + loginCode,
+    method: 'get'
+  })
+}
+
+export function getInfo() {
+  return request({
+    url: '/user/info',
+    method: 'get'
   })
 }
 
 export function logout() {
   return request({
-    url: '/vue-admin-template/user/logout',
+    url: '/user/logout',
     method: 'post'
   })
 }

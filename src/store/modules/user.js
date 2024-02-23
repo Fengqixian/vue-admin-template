@@ -31,11 +31,16 @@ const actions = {
   // user login
   login({ commit }, loginCode) {
     return new Promise((resolve, reject) => {
-      login({ loginCode: loginCode }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        resolve()
+      login(loginCode).then(data => {
+        if (data === undefined || data === null) {
+          resolve(false)
+          return
+        }
+
+        console.log('token:' + data)
+        commit('SET_TOKEN', data)
+        setToken(data)
+        resolve(true)
       }).catch(error => {
         reject(error)
       })
@@ -45,17 +50,15 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const { data } = response
-
+      getInfo().then(data => {
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar } = data
+        const { nickName, avatarUrl } = data
 
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        commit('SET_NAME', nickName)
+        commit('SET_AVATAR', avatarUrl)
         resolve(data)
       }).catch(error => {
         reject(error)
