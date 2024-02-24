@@ -1,5 +1,13 @@
 import request from '@/utils/request'
 
+export function manageUserList(data) {
+  return request({
+    url: '/manage/user/list',
+    method: 'post',
+    data
+  })
+}
+
 export function wechatLoginCode() {
   return request({
     url: '/wechat/login/qr/code',
