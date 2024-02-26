@@ -5,7 +5,7 @@
         <el-input v-model="formInline.id" placeholder="商品ID" />
       </el-form-item>
       <el-form-item label="商品名称">
-        <el-input v-model="formInline.nickName" placeholder="商品名称" />
+        <el-input v-model="formInline.goodsTitle" placeholder="商品名称" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">查询</el-button>
@@ -15,26 +15,33 @@
     </el-form>
 
     <el-table size="mini" :stripe="true" :data="userList" style="width: 100%">
-      <el-table-column align="center" prop="userInfo.id" label="商品ID" width="80" />
-      <el-table-column align="center" label="商品类型" width="180">
+      <el-table-column align="center" prop="id" label="商品ID" width="80" />
+      <el-table-column label="商品类型" width="80">
         <template slot-scope="scope">
-          <el-avatar shape="square" size="small" :src="scope.row.userInfo.avatar" />
+          {{ GoodsType[scope.row.goodsType]?GoodsType[scope.row.goodsType]:'未知' }}
         </template>
       </el-table-column>
-      <el-table-column label="封面" width="180">
+      <el-table-column
+        label="商品封面"
+        width="80"
+      >
         <template slot-scope="scope">
-          {{ GoodsType[scope.row.userInfo.avatar]?GoodsType[scope.row.userInfo.avatar]:'未知' }}
+          <el-avatar shape="square" size="small" :src="scope.row.goodsCoverImage" />
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="userInfo.nickName" label="商品名称" width="80" />
-      <el-table-column align="center" prop="userInfo.nickName" label="商品描述" />
-      <el-table-column align="center" prop="userInfo.nickName" label="单价" width="80" />
-      <el-table-column align="center" prop="userInfo.nickName" label="已售" width="80" />
-      <el-table-column align="center" prop="userInfo.nickName" label="库存" width="80" />
-      <el-table-column align="center" prop="userInfo.nickName" label="上下架状态" width="80" />
-      <el-table-column align="center" prop="userInfo.nickName" label="排序权重" width="80" />
-      <el-table-column align="center" prop="userInfo.nickName" label="创建时间" width="180" />
-      <el-table-column align="center" prop="userInfo.nickName" label="创建人" width="180" />
+      <el-table-column align="center" prop="goodsTitle" label="商品名称" />
+      <el-table-column align="center" prop="goodsDescribe" label="商品描述" />
+      <el-table-column align="center" prop="price" label="单价" width="80" />
+      <el-table-column align="center" prop="nickName" label="已售" width="80" />
+      <el-table-column align="center" prop="quantity" label="库存" width="80" />
+      <el-table-column label="上下架状态" width="80">
+        <template slot-scope="scope">
+          {{ PublishState[scope.row.publishState] }}
+        </template>
+      </el-table-column>
+      <el-table-column align="center" prop="sort" label="排序权重" width="80" />
+      <el-table-column align="center" prop="createTime" label="创建时间" width="180" />
+      <el-table-column align="center" prop="createUser" label="创建人" width="180" />
       <el-table-column fixed="right" label="操作" width="180">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click.native.prevent="deleteRow(scope.$index, tableData)">
@@ -62,8 +69,9 @@
 
 <script>
 import CreateGoods from '@/components/CreateGoods'
-import { manageUserList } from '../../api/user'
+import { manageGoodsList } from '../../api/goods'
 import { GoodsType } from '../../utils/goods-type'
+import { PublishState } from '../../utils/publish-state'
 
 export default {
   components: {
@@ -73,10 +81,11 @@ export default {
     return {
       updateGoods: {},
       GoodsType: GoodsType,
+      PublishState: PublishState,
       goodsDialog: false,
       formInline: {
         id: null,
-        nickName: null
+        goodsTitle: null
       },
       userList: [],
       total: 0,
@@ -105,13 +114,13 @@ export default {
       }
     },
     onSubmit() {
-      this.getManageUserList(1)
+      this.getManageGoodsList(1)
     },
     changeCurrentPageEvent(page) {
-      this.getManageUserList(page)
+      this.getManageGoodsList(page)
     },
-    getManageUserList(page) {
-      manageUserList({ condition: this.formInline, page: page, size: this.pageSize }).then(res => {
+    getManageGoodsList(page) {
+      manageGoodsList({ condition: this.formInline, page: page, size: this.pageSize }).then(res => {
         this.userList = res.list
         this.total = res.total
       })
