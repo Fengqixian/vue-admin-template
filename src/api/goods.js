@@ -7,3 +7,11 @@ export function manageGoodsList(data) {
     data
   })
 }
+
+export function createGoods(data) {
+  return request({
+    url: '/manage/goods/create',
+    method: 'post',
+    data
+  })
+}

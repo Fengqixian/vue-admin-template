@@ -13,29 +13,35 @@
       :on-remove="removePic"
       :http-request="uploadQiniu"
     >
-      <img v-if="dialogImageUrl" :src="dialogImageUrl" class="avatar">
-      <i v-else class="el-icon-plus avatar-uploader-icon" />
+      <i class="el-icon-plus avatar-uploader-icon" />
     </el-upload>
 
   </div>
 </template>
 <script>
 import axios from 'axios'
+import { getFileUploadToken, uploadResourceInfo } from '../../api/user'
 
 export default {
   name: 'UploadFile',
   props: {
-    dialogImageUrl: {
-      type: String,
-      default: function() { return '' }
+    dialogImageList: {
+      type: Array,
+      default: function() { return [] }
     }
   },
   data() {
     return {
+      token: null,
       fileList: [],
-      upload_qiniu_area: 'https://upload-z2.qiniup.com', // 七牛云上传储存区域的上传域名
-      token: '-rjpJvRjStoqz_RANz2Rh_Rh06ubc_3gB1DhSnvz:D6J-YbjYVVpzcD1JkZdTYtkZbiM=:eyJpbnNlcnRPbmx5IjoxLCJzY29wZSI6Imhvb2tmdW5jIiwicmV0dXJuQm9keSI6IntcbiAgICBcInVybFwiOiBcImh0dHBzOi8vb3NzLmhvb2tmdW5jLmNvbS8kKGtleSlcIixcbiAgICBcInNpemVcIjogJChmc2l6ZSksXG4gICAgXCJ0eXBlXCI6ICQobWltZVR5cGUpLFxuICAgIFwiaGFzaFwiOiAkKGV0YWcpLFxuICAgIFwid1wiOiAkKGltYWdlSW5mby53aWR0aCksXG4gICAgXCJoXCI6ICQoaW1hZ2VJbmZvLmhlaWdodClcbn0iLCJkZWFkbGluZSI6MTcwOTAyNjgxNiwiZmlsZVR5cGUiOjB9'
+      upload_qiniu_area: 'https://upload-z2.qiniup.com' // 七牛云上传储存区域的上传域名
     }
+  },
+  created() {
+    this.fileList = this.dialogImageList
+    getFileUploadToken().then(res => {
+      this.token = res
+    })
   },
   methods: {
     picCardPreview(file) { // 上传图预览
@@ -63,12 +69,15 @@ export default {
       this.fileList = fileList
     },
     uploadQiniu(request) { // 上传七牛
+      const _this = this
       this.handleUpload(request).then((result) => {
         if (!result.data.url) {
           this.$message.error({ message: '图片上传失败,请重新上传', duration: 2000 })
         } else {
-          this.fileList.push({ url: result.data.url })
-          this.$emit('uploadSuccess', this.fileList)
+          uploadResourceInfo({ resourceLink: result.data.url, resourceType: 0 }).then(res => {
+            this.fileList.push({ url: result.data.url, id: res })
+            _this.$emit('uploadsuccess', this.fileList)
+          })
         }
       }).catch((err) => {
         console.log(err)
@@ -94,7 +103,6 @@ export default {
         fd.append('token', this.token)
         fd.append('key', key)
         axios.post(this.upload_qiniu_area, fd, config).then(res => {
-          console.log(res)
           if (res.status === 200 && res.data) {
             resolve(res)
           } else {

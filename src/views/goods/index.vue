@@ -101,12 +101,13 @@ export default {
       this.goodsDialog = true
     },
     updateRow(index, row) {
-      this.updateGoods = { goodsName: '测试' }
+      this.updateGoods = row
       this.goodsDialog = true
     },
     closeGoodsDialogEvent() {
       this.goodsDialog = false
       this.updateGoods = {}
+      this.getManageGoodsList(1)
     },
     onClean() {
       for (const key in this.formInline) {

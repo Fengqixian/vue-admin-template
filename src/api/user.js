@@ -1,5 +1,20 @@
 import request from '@/utils/request'
 
+export function getFileUploadToken() {
+  return request({
+    url: '/file/upload/token',
+    method: 'post'
+  })
+}
+
+export function uploadResourceInfo(data) {
+  return request({
+    url: '/file/upload/resource',
+    method: 'post',
+    data
+  })
+}
+
 export function manageUserList(data) {
   return request({
     url: '/manage/user/list',

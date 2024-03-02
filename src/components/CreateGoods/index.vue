@@ -13,13 +13,13 @@
         </el-select>
       </el-form-item>
       <el-form-item
-        prop="goodsName"
+        prop="goodsTitle"
         label="商品名称"
         :rules="[
           { required: true, message: '请输入商品名称', trigger: 'blur' }
         ]"
       >
-        <el-input v-model="dynamicValidateForm.goodsName" />
+        <el-input v-model="dynamicValidateForm.goodsTitle" />
       </el-form-item>
       <el-form-item
         prop="goodsDescribe"
@@ -61,7 +61,7 @@
           { required: true, message: '请上传商品展示封面图片'},
         ]"
       >
-        <UploadFile />
+        <UploadFile :dialog-image-list="dialogImageList" @uploadsuccess="uploadsuccess" />
       </el-form-item>
       <el-form-item
         prop="sort"
@@ -83,6 +83,7 @@
 <script>
 import UploadFile from '../UploadFile'
 import { GoodsType } from '../../utils/goods-type'
+import { createGoods } from '@/api/goods'
 export default {
   name: 'CreateGoods',
   components: { UploadFile },
@@ -94,28 +95,40 @@ export default {
   },
   data() {
     return {
+      dialogImageList: [],
       GoodsTypeList: GoodsType,
       coverImageUrl: this.goods?.coverImageUrl,
       dynamicValidateForm: {
         id: this.goods?.id,
         goodsType: this.goods?.goodsType,
-        goodsName: this.goods?.goodsName,
+        goodsTitle: this.goods?.goodsTitle,
         goodsDescribe: this.goods?.goodsDescribe,
         price: this.goods?.price,
         quantity: this.goods?.quantity,
         sort: this.goods?.sort,
-        goodsCoverId: this.goods?.goodsCoverId
+        goodsCoverId: this.goods?.goodsCoverId,
+        goodsCoverImage: this.goods?.goodsCoverImage
       }
     }
   },
+  created() {
+    if (this.goods.goodsCoverId != null && this.goods.goodsCoverId !== undefined) {
+      this.dialogImageList = [{ id: this.goods?.goodsCoverId, url: this.goods?.goodsCoverImage }]
+    }
+  },
   methods: {
+    uploadsuccess(fileList) {
+      this.dynamicValidateForm.goodsCoverId = fileList[0].id
+      console.log(this.dynamicValidateForm)
+    },
     submitForm(formName) {
       console.log(this.dynamicValidateForm)
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!')
+          createGoods(this.dynamicValidateForm).then(() => {
+            this.cancelEvent()
+          })
         } else {
-          console.log('error submit!!')
           return false
         }
       })
