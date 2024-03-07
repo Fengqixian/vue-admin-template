@@ -36,7 +36,8 @@
       <el-table-column align="center" prop="quantity" label="库存" width="80" />
       <el-table-column label="上下架状态" width="80">
         <template slot-scope="scope">
-          {{ PublishState[scope.row.publishState] }}
+          <el-tag v-if="scope.row.publishState == 1" type="success">{{ PublishState[scope.row.publishState] }}</el-tag>
+          <el-tag v-else type="danger">{{ PublishState[scope.row.publishState] }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" prop="sort" label="排序权重" width="80" />
@@ -44,13 +45,13 @@
       <el-table-column align="center" prop="createUser" label="创建人" width="180" />
       <el-table-column fixed="right" label="操作" width="180">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click.native.prevent="deleteRow(scope.$index, tableData)">
-            下架/上架
+          <el-button type="text" size="small" @click.native.prevent="publishStateUpdateEvent(scope.$index, scope.row)">
+            {{ scope.row.publishState == 1 ? '下架' : '上架' }}
           </el-button>
           <el-button type="text" size="small" @click.native.prevent="updateRow(scope.$index, scope.row)">
             编辑
           </el-button>
-          <el-button type="text" size="small" @click.native.prevent="deleteRow(scope.$index, tableData)">
+          <el-button type="text" size="small" @click.native.prevent="deleteRow(scope.$index, scope.row)">
             删除
           </el-button>
         </template>
@@ -69,7 +70,7 @@
 
 <script>
 import CreateGoods from '@/components/CreateGoods'
-import { manageGoodsList } from '../../api/goods'
+import { manageGoodsList, updatePublishState } from '../../api/goods'
 import { GoodsType } from '../../utils/goods-type'
 import { PublishState } from '../../utils/publish-state'
 
@@ -124,6 +125,11 @@ export default {
       manageGoodsList({ condition: this.formInline, page: page, size: this.pageSize }).then(res => {
         this.userList = res.list
         this.total = res.total
+      })
+    },
+    publishStateUpdateEvent(index, row) {
+      updatePublishState(row.id, row.publishState === 1 ? 0 : 1).then(() => {
+        this.getManageGoodsList(1)
       })
     }
   }

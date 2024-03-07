@@ -9,7 +9,7 @@
         ]"
       >
         <el-select v-model="dynamicValidateForm.goodsType" placeholder="请选择商品类型">
-          <el-option v-for="(value,key) in GoodsTypeList" :key="'item' + key" :label="value" :value="key" />
+          <el-option v-for="(value, key) in GoodsTypeList" :key="'item' + key" :label="value" :value="key" />
         </el-select>
       </el-form-item>
       <el-form-item
@@ -28,18 +28,14 @@
           { required: true, message: '请输入商品商品描述', trigger: 'blur' }
         ]"
       >
-        <el-input
-          v-model="dynamicValidateForm.goodsDescribe"
-          type="textarea"
-          :rows="2"
-        />
+        <el-input v-model="dynamicValidateForm.goodsDescribe" type="textarea" :rows="2" />
       </el-form-item>
       <el-form-item
         prop="price"
         label="单价"
         :rules="[
-          { required: true, message: '单价不能为空'},
-          { type: 'number', message: '单价必须为数字值'}
+          { required: true, message: '单价不能为空' },
+          { type: 'number', message: '单价必须为数字值' }
         ]"
       >
         <el-input v-model.number="dynamicValidateForm.price" autocomplete="off" />
@@ -48,8 +44,8 @@
         prop="quantity"
         label="库存"
         :rules="[
-          { required: true, message: '库存不能为空'},
-          { type: 'number', message: '库存必须为数字值'}
+          { required: true, message: '库存不能为空' },
+          { type: 'number', message: '库存必须为数字值' }
         ]"
       >
         <el-input v-model.number="dynamicValidateForm.quantity" placeholder="输入-1则为无限库存数量" autocomplete="off" />
@@ -58,7 +54,7 @@
         prop="goodsCoverId"
         label="封面图片"
         :rules="[
-          { required: true, message: '请上传商品展示封面图片'},
+          { required: true, message: '请上传商品展示封面图片' },
         ]"
       >
         <UploadFile :dialog-image-list="dialogImageList" @uploadsuccess="uploadsuccess" />
@@ -67,13 +63,14 @@
         prop="sort"
         label="排序权重"
         :rules="[
-          { type: 'number', message: '排序权重必须为数字值'}
+          { type: 'number', message: '排序权重必须为数字值' }
         ]"
       >
         <el-input v-model.number="dynamicValidateForm.sort" placeholder="数值越大排序越靠前" autocomplete="off" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm('dynamicValidateForm')">添加</el-button>
+        <el-button type="primary" @click="submitForm('dynamicValidateForm')">{{ dynamicValidateForm.id == null ?
+          '添加' : '更新' }}</el-button>
         <el-button @click="cancelEvent">取消</el-button>
       </el-form-item>
     </el-form>
@@ -83,7 +80,7 @@
 <script>
 import UploadFile from '../UploadFile'
 import { GoodsType } from '../../utils/goods-type'
-import { createGoods } from '@/api/goods'
+import { createGoods, updateGoods } from '@/api/goods'
 export default {
   name: 'CreateGoods',
   components: { UploadFile },
@@ -125,9 +122,15 @@ export default {
       console.log(this.dynamicValidateForm)
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          createGoods(this.dynamicValidateForm).then(() => {
-            this.cancelEvent()
-          })
+          if (this.dynamicValidateForm.id == null) {
+            createGoods(this.dynamicValidateForm).then(() => {
+              this.cancelEvent()
+            })
+          } else {
+            updateGoods(this.dynamicValidateForm).then(() => {
+              this.cancelEvent()
+            })
+          }
         } else {
           return false
         }
@@ -139,4 +142,3 @@ export default {
   }
 }
 </script>
-
