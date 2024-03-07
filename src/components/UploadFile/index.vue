@@ -4,7 +4,7 @@
       class="avatar-uploader"
       :action="upload_qiniu_area"
       :auto-upload="true"
-      :limit="1"
+      :limit="limit"
       accept="image/jpg,image/png,image/jpeg"
       :file-list="fileList"
       list-type="picture-card"
@@ -28,6 +28,10 @@ export default {
     dialogImageList: {
       type: Array,
       default: function() { return [] }
+    },
+    limit: {
+      type: Number,
+      default: function() { return 1 }
     }
   },
   data() {
@@ -38,7 +42,15 @@ export default {
     }
   },
   created() {
-    this.fileList = this.dialogImageList
+    this.fileList = []
+    if (this.dialogImageList !== null && this.dialogImageList !== undefined) {
+      this.dialogImageList.forEach(element => {
+        if (element !== undefined) {
+          this.fileList.push({ id: element.id, url: element.resourceLink })
+        }
+      })
+    }
+
     getFileUploadToken().then(res => {
       this.token = res
     })
@@ -67,6 +79,7 @@ export default {
     },
     removePic(file, fileList) { // 移除图片
       this.fileList = fileList
+      this.$emit('uploadsuccess', this.fileList)
     },
     uploadQiniu(request) { // 上传七牛
       const _this = this

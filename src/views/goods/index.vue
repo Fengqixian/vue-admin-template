@@ -26,7 +26,7 @@
         width="80"
       >
         <template slot-scope="scope">
-          <el-avatar shape="square" size="small" :src="scope.row.goodsCoverImage" />
+          <el-avatar shape="square" size="small" :src="scope.row.goodsCoverImage.resourceLink" />
         </template>
       </el-table-column>
       <el-table-column align="center" prop="goodsTitle" label="商品名称" />
@@ -50,9 +50,6 @@
           </el-button>
           <el-button type="text" size="small" @click.native.prevent="updateRow(scope.$index, scope.row)">
             编辑
-          </el-button>
-          <el-button type="text" size="small" @click.native.prevent="deleteRow(scope.$index, scope.row)">
-            删除
           </el-button>
         </template>
       </el-table-column>

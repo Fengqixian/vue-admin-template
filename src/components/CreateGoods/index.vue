@@ -60,6 +60,15 @@
         <UploadFile :dialog-image-list="dialogImageList" @uploadsuccess="uploadsuccess" />
       </el-form-item>
       <el-form-item
+        prop="goodsDetailSourceList"
+        label="商品展示"
+        :rules="[
+          { required: true, message: '请上传商品展示内容' },
+        ]"
+      >
+        <UploadFile :limit="10" :dialog-image-list="dialogGoodsDetailImageList" @uploadsuccess="uploaddetailsuccess" />
+      </el-form-item>
+      <el-form-item
         prop="sort"
         label="排序权重"
         :rules="[
@@ -92,7 +101,8 @@ export default {
   },
   data() {
     return {
-      dialogImageList: [],
+      dialogImageList: [this.goods?.goodsCoverImage],
+      dialogGoodsDetailImageList: this.goods?.goodsDetailSourceDetailList,
       GoodsTypeList: GoodsType,
       coverImageUrl: this.goods?.coverImageUrl,
       dynamicValidateForm: {
@@ -104,19 +114,25 @@ export default {
         quantity: this.goods?.quantity,
         sort: this.goods?.sort,
         goodsCoverId: this.goods?.goodsCoverId,
-        goodsCoverImage: this.goods?.goodsCoverImage
+        goodsDetailSourceList: this.goods?.goodsDetailSourceList
       }
     }
   },
-  created() {
-    if (this.goods.goodsCoverId != null && this.goods.goodsCoverId !== undefined) {
-      this.dialogImageList = [{ id: this.goods?.goodsCoverId, url: this.goods?.goodsCoverImage }]
-    }
-  },
   methods: {
+    uploaddetailsuccess(fileList) {
+      console.log(fileList)
+      this.dynamicValidateForm.goodsDetailSourceList = []
+      fileList.forEach(element => {
+        this.dynamicValidateForm.goodsDetailSourceList.push(element.id)
+      })
+    },
     uploadsuccess(fileList) {
+      if (fileList.length === 0) {
+        this.dynamicValidateForm.goodsCoverId = null
+        return
+      }
+
       this.dynamicValidateForm.goodsCoverId = fileList[0].id
-      console.log(this.dynamicValidateForm)
     },
     submitForm(formName) {
       console.log(this.dynamicValidateForm)
